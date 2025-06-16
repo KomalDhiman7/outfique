@@ -1,0 +1,28 @@
+.weather-card {
+  background-color: #fdf6f9;
+  border: 2px dashed #ffb6c1;
+  padding: 1.5rem;
+  border-radius: 15px;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+
+  h3 {
+    margin-bottom: 0.8rem;
+    color: #e91e63;
+  }
+
+  p {
+    margin: 0.3rem 0;
+    font-size: 1rem;
+  }
+
+  .suggestion {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #333;
+    background: #fff;
+    padding: 0.8rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+}

@@ -1,0 +1,15 @@
+/* App.css */
+.app {
+  height: 100vh;
+  background: #111;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-heading {
+  font-size: 3rem;
+  color: hotpink;
+  font-weight: bold;
+}

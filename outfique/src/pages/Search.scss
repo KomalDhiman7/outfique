@@ -1,0 +1,51 @@
+.search-page {
+  padding: 2rem;
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 400px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.tag-filter {
+  margin-bottom: 1.5rem;
+
+  button {
+    margin: 0 0.5rem 0.5rem 0;
+    padding: 6px 12px;
+    background-color: #eee;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #ddd;
+    }
+
+    &.active-tag {
+      background-color: hotpink;
+      color: white;
+    }
+  }
+}
+
+.outfit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.no-results {
+  text-align: center;
+  color: gray;
+  font-size: 1.2rem;
+  margin-top: 3rem;
+}

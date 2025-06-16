@@ -1,0 +1,19 @@
+.loader-container {
+  height: 100vh;
+  background-color: #111;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-caption {
+  font-size: 1.5rem;
+  color: hotpink;
+  font-style: italic;
+  animation: fade 1.5s ease-in-out infinite;
+}
+
+@keyframes fade {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
