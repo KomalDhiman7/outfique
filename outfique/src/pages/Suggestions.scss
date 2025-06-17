@@ -34,3 +34,32 @@
   }
 }
 
+.city-search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+  justify-content: center;
+
+  input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 60%;
+    font-size: 1rem;
+  }
+
+  button {
+    background: #111;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s ease-in;
+
+    &:hover {
+      background: #333;
+    }
+  }
+}
