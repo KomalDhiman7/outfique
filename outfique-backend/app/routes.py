@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from . import db
+from .models import WardrobeItem
 import os
 from werkzeug.utils import secure_filename
-from .models import WardrobeItem
 
 bp = Blueprint('routes', __name__)
 
@@ -17,14 +17,9 @@ def upload_wardrobe():
         return jsonify({'error': 'No filename'}), 400
 
     filename = secure_filename(file.filename)
-    file_path = os.path.join('app/static/uploads', filename)
-
-    # Make sure folder exists
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-
+    file_path = os.path.join('app', 'static', 'uploads', filename)
     file.save(file_path)
 
-    # Save to DB
     item = WardrobeItem(filename=filename, caption=caption)
     db.session.add(item)
     db.session.commit()
@@ -37,3 +32,28 @@ def upload_wardrobe():
             'caption': item.caption
         }
     })
+
+@bp.route('/wardrobe', methods=['GET'])
+def get_wardrobe():
+    items = WardrobeItem.query.all()
+    return jsonify([
+        {
+            'id': item.id,
+            'filename': item.filename,
+            'caption': item.caption,
+            'image_url': f'/static/uploads/{item.filename}'
+        }
+        for item in items
+    ])
+@bp.route('/wardrobe/<int:item_id>', methods=['DELETE'])
+def delete_wardrobe_item(item_id):
+    item = WardrobeItem.query.get(item_id)
+    if not item:
+        return jsonify({'error': 'Not found'}), 404
+    db.session.delete(item)
+    db.session.commit()
+    return jsonify({'message': 'Deleted'})
+
+@bp.route('/')
+def home():
+    return jsonify({'message': 'Outfique API is slaying 💅'})

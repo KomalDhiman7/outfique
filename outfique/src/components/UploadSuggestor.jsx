@@ -12,13 +12,35 @@ const UploadSuggestor = () => {
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!image || !caption) {
       alert('Add both image and a cute lil caption 🥲');
       return;
     }
-    alert('Upload logic coming soon — slay saved locally 💾✨');
-    // Later: hook with backend or Firebase
+
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('caption', caption);
+
+    try {
+      const res = await fetch('http://127.0.0.1:5000/upload-wardrobe', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert('Uploaded successfully! 🫶');
+        console.log(data); // You can use this to show preview or update UI
+      } else {
+        alert('Upload failed 💔: ' + data.error);
+      }
+    } catch (err) {
+      console.error('Error uploading:', err);
+      alert('Server crashed on your slay 😩');
+    }
+
     setImage(null);
     setPreview(null);
     setCaption('');
