@@ -8,19 +8,19 @@ const dummyPosts = [
   {
     id: 1,
     user: "KomalSlays",
-    image: "/assets/fit1.jpg",
+    image: "https://www.pexels.com/photo/woman-sitting-on-top-of-building-s-edge-1755385/",
     caption: "Date night slay ✨",
   },
   {
     id: 2,
     user: "Stylista33",
-    image: "/assets/fit2.jpg",
+    image: "https://www.pexels.com/photo/woman-in-grey-sleeveless-top-leaning-on-wall-1375849/",
     caption: "Chillin' but make it chic",
   },
   {
     id: 3,
     user: "Stylista33",
-    image: "/assets/fit2.jpg",
+    image: "https://www.pexels.com/photo/women-s-blue-tank-top-and-black-pants-616376/",
     caption: "Chillin' but make it chic",
   },
   {
