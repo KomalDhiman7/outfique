@@ -1,27 +1,64 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Suggestions from './pages/Suggestions';
 import Wardrobe from './pages/Wardrobe';
 import Notifications from './pages/Notifications';
 import Profile from './pages/Profile';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import { ThemeProvider } from './ThemeContext';
+import supabase from './supabase';
 import './App.css';
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+
   return (
-    <Router>
-      <Navbar />
-      <div className="main-content">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/suggestions" element={<Suggestions />} />
-          <Route path="/wardrobe" element={<Wardrobe />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        {user && <Navbar user={user} />}
+        <div className="main-content">
+          <Routes>
+            {!user ? (
+              <>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="*" element={<Navigate to="/login" />} />
+              </>
+            ) : (
+              <>
+                <Route path="/" element={<Home />} />
+                <Route path="/suggestions" element={<Suggestions />} />
+                <Route path="/wardrobe" element={<Wardrobe />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </>
+            )}
+          </Routes>
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

@@ -1,8 +1,11 @@
+import React from 'react';
+import WardrobeUploader from '../components/WardrobeUploader';
+
 function Wardrobe() {
   return (
-    <div>
-      <h1>👗 My Wardrobe</h1>
-      <p>Upload and view your clothes here.</p>
+    <div style={{ padding: '2rem' }}>
+      <h2>My Wardrobe</h2>
+      <WardrobeUploader />
     </div>
   );
 }

@@ -1,8 +1,19 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import supabase from '../supabase';
+
 function Profile() {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
+
   return (
-    <div>
-      <h1>🙍‍♀️ My Profile</h1>
-      <p>Manage your bio, wardrobe, and saved outfits.</p>
+    <div className="profile-page">
+      <h2>My Profile</h2>
+      <button onClick={handleLogout}>Logout</button>
     </div>
   );
 }
