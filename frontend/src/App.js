@@ -1,3 +1,4 @@
+// App.js
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -41,9 +42,9 @@ function App() {
           <Routes>
             {!user ? (
               <>
-                <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
-                <Route path="*" element={<Navigate to="/login" />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="*" element={<Navigate to="/signup" />} />
               </>
             ) : (
               <>

@@ -1,39 +1,93 @@
+.auth-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #ffe4ec, #fff0f5);
+}
+
 .auth-form {
+  background: #fff;
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  width: 90%;
   max-width: 400px;
-  margin: 60px auto;
-  padding: 30px;
-  border: 2px solid var(--accent-color);
-  border-radius: 10px;
-  background-color: var(--bg-color);
+  text-align: center;
 }
 
 .auth-form h2 {
-  text-align: center;
-  color: var(--text-color);
+  color: #e91e63;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
 }
 
-.auth-form input {
+.auth-form input[type="email"],
+.auth-form input[type="password"] {
   width: 100%;
-  margin: 10px 0;
-  padding: 10px;
-  border: 1px solid var(--accent-color);
-  border-radius: 5px;
-  background: #fff;
+  padding: 0.9rem;
+  margin: 0.6rem 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
 }
 
-.auth-form button {
+button {
   width: 100%;
-  padding: 10px;
-  background-color: var(--accent-color);
-  color: white;
+  padding: 0.9rem;
+  margin-top: 1rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  background-color: #e91e63;
+  color: white;
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
 }
 
-.auth-form .error {
+button:hover {
+  background-color: #d81b60;
+}
+
+.google-btn {
+  background-color: #fff;
+  color: #e91e63;
+  border: 2px solid #e91e63;
+}
+
+.google-btn:hover {
+  background-color: #fce4ec;
+}
+
+.error {
   color: red;
-  margin-top: 10px;
-  text-align: center;
+  font-size: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.captcha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #444;
+  justify-content: flex-start;
+}
+
+.divider {
+  margin: 1.2rem 0;
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.switch-link {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.switch-link a {
+  color: #e91e63;
+  text-decoration: none;
+  font-weight: bold;
 }
