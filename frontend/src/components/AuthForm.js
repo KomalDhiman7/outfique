@@ -16,7 +16,7 @@ function AuthForm({ type }) {
     setError('');
 
     if (!isLogin && captchaSelected !== 'dog') {
-      setError('Please select the pet dog to continue!');
+      setError('Please complete the pinky promise captcha to continue!');
       return;
     }
 
@@ -47,33 +47,19 @@ function AuthForm({ type }) {
     <div className="auth-form-container">
       <div className="auth-form">
         <h2>{isLogin ? 'Welcome back 👋' : 'Join Outfique 💖'}</h2>
-
         <form onSubmit={handleAuth}>
           <input type="email" placeholder="Email" onChange={e => setEmail(e.target.value)} required />
           <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} required />
 
           {!isLogin && (
             <>
-              <p className="captcha-instruction">Tap the pet dog to prove you’re human:</p>
-              <div className="captcha-grid">
-                <div
-                  className={`captcha-card ${captchaSelected === 'dog' ? 'selected' : ''}`}
-                  onClick={() => setCaptchaSelected('dog')}
-                >
-                  <img src="https://i.imgur.com/YC4kNdV.jpg" alt="pet dog" />
-                </div>
-                <div
-                  className={`captcha-card ${captchaSelected === 'pinky' ? 'selected' : ''}`}
-                  onClick={() => setCaptchaSelected('pinky')}
-                >
-                  <img src="https://i.imgur.com/pinky-promise.jpg" alt="pinky promise" />
-                </div>
-              </div>
+              <PinkyPromiseCaptcha
+                setCaptchaSelected={setCaptchaSelected}
+                captchaSelected={captchaSelected}
+              />
             </>
           )}
-
           <button type="submit">{isLogin ? 'Login' : 'Signup'}</button>
-
           {error && <p className="error">{error}</p>}
         </form>
 
@@ -90,6 +76,84 @@ function AuthForm({ type }) {
           {isLogin ? 'Login' : 'Signup'} with Google
         </button>
       </div>
+    </div>
+  );
+}
+
+function PinkyPromiseCaptcha({ setCaptchaSelected, captchaSelected }) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragPosition, setDragPosition] = useState({ x: 180, y: 60 });
+  const leftHandPos = { x: 60, y: 60 };
+  const overlapThreshold = 50;
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mouseX = e.type.startsWith('touch')
+      ? e.touches[0].clientX - rect.left
+      : e.clientX - rect.left;
+    const mouseY = e.type.startsWith('touch')
+      ? e.touches[0].clientY - rect.top
+      : e.clientY - rect.top;
+    setDragPosition({ x: mouseX - 40, y: mouseY - 40 });
+
+    const dist = Math.sqrt(
+      Math.pow(mouseX - leftHandPos.x, 2) + Math.pow(mouseY - leftHandPos.y, 2)
+    );
+    if (dist < overlapThreshold) {
+      setCaptchaSelected('dog');
+      setIsDragging(false);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  // Touch mobile support events
+  const handleTouchStart = handleMouseDown;
+  const handleTouchEnd = handleMouseUp;
+
+  return (
+    <div className="pinky-captcha-area"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onTouchMove={handleMouseMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <span className="captcha-instruction">Make a pinky promise to sign up</span>
+      {/* Left hand, fixed/sticky */}
+      <img
+        src="/pinky-swear.png"
+        alt="Left hand"
+        className="pinky-hand left"
+        style={{ left: leftHandPos.x, top: leftHandPos.y }}
+        draggable="false"
+      />
+      {/* Right hand, draggable */}
+      <img
+        src="/pinky-promise.png"
+        alt="Right hand (drag me)"
+        className={`pinky-hand right${isDragging ? ' dragging' : ''}${captchaSelected === 'dog' ? ' done' : ''}`}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        style={{
+          left: dragPosition.x,
+          top: dragPosition.y,
+          pointerEvents: captchaSelected === 'dog' ? 'none' : 'auto',
+          opacity: captchaSelected === 'dog' ? 0.5 : 1
+        }}
+        draggable="false"
+      />
+      {captchaSelected === 'dog' && (
+        <div className="captcha-success-msg">Pinky promise made!</div>
+      )}
     </div>
   );
 }
