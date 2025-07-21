@@ -76,10 +76,10 @@ button:hover {
   position: relative;
   margin: 1.2rem 0 1.8rem 0;
   min-height: 180px;
-  background: linear-gradient(135deg, #fffafd 70%, #fce4ec 100%);
+  /* background: linear-gradient(135deg, #fffafd 70%, #fce4ec 100%);
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(233, 30, 99, 0.06);
-  border: 2px dashed #f8bbd9;
+  border: 2px dashed #f8bbd9; */
   overflow: hidden;
   width: 320px;
   max-width: 94vw;
@@ -100,8 +100,7 @@ button:hover {
 .pinky-hand.left {
   z-index: 1;
   filter: drop-shadow(0 0px 8px #e91e6355);
-  border-radius: 40px;
-  background: #fff;
+  
 }
 
 .pinky-hand.right {
@@ -163,4 +162,22 @@ button:hover {
     width: 60px;
     height: 60px;
   }
+}
+.pinky-promise-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.pinky-promise-text {
+  color: #e91e63;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
 }

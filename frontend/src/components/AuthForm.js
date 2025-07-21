@@ -53,6 +53,9 @@ function AuthForm({ type }) {
 
           {!isLogin && (
             <>
+            <div className="pinky-promise-row">
+      <span className="pinky-promise-text">Make a pinky promise to sign up</span>
+    </div>
               <PinkyPromiseCaptcha
                 setCaptchaSelected={setCaptchaSelected}
                 captchaSelected={captchaSelected}
@@ -127,7 +130,6 @@ function PinkyPromiseCaptcha({ setCaptchaSelected, captchaSelected }) {
       onTouchMove={handleMouseMove}
       onTouchEnd={handleTouchEnd}
     >
-      <span className="captcha-instruction">Make a pinky promise to sign up</span>
       {/* Left hand, fixed/sticky */}
       <img
         src="/pinky-swear.png"
