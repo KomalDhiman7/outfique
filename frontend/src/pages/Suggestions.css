@@ -60,9 +60,9 @@
   transition: background-color 0.2s;
 }
 
-.suggestions-container button:hover {
+/* .suggestions-container button:hover {
   background-color: darken(var(--accent-color), 10%);
-}
+} */
 
 .weather-info {
   margin: 1.5rem 0;
