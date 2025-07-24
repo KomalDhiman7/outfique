@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './Suggestions.css';
 
+import supabase from '../supabase';
+
+import './Suggestions.css';
 
 function Suggestions() {
   const [city, setCity] = useState('');
@@ -10,11 +12,43 @@ function Suggestions() {
   const [mood, setMood] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [matchingImage, setMatchingImage] = useState(null);
+  const [suggestions, setSuggestions] = useState([]); // FIXED
 
   const moods = ['Party', 'Fun', 'Sleep', 'Happy', 'Beach', 'Mountains'];
-
-  // Replace this with your actual API key
   const API_KEY = '56c845eb908d61f92aebecf35d8b7802';
+
+  // ✅ 1. FETCH SUGGESTIONS
+  const fetchSuggestions = async () => {
+    try {
+      const res = await axios.get('/api/suggestions'); // or full URL
+      setSuggestions(res.data);
+      console.log('Suggestions fetched:', res.data);
+    } catch (err) {
+      console.error('Suggestions fetch error:', err);
+    }
+  };
+
+  // ✅ 2. SUPABASE REALTIME
+  useEffect(() => {
+    const subscription = supabase
+      .channel('custom-suggestions-channel')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'suggestions' },
+        () => fetchSuggestions()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
+
+  // ✅ 3. GET LOCATION ON MOUNT
+  useEffect(() => {
+    getLocationWeather();
+    fetchSuggestions();
+  }, []);
 
   const fetchWeather = async (selectedCity) => {
     try {
@@ -57,7 +91,6 @@ function Suggestions() {
     }
 
     const temp = weather.main.temp;
-
     let baseSuggestion = '';
     if (temp >= 30) baseSuggestion = 'Skirt with half-sleeves & sneakers';
     else if (temp >= 20) baseSuggestion = 'Jeans and t-shirt with shoes';
@@ -75,77 +108,83 @@ function Suggestions() {
     const finalSuggestion = `${baseSuggestion} ${moodBasedAddOn[mood] || ''}`;
     setSuggestion(finalSuggestion);
 
-    // Dummy wardrobe color match (you can replace this logic with OpenCV)
-    // Let's say if the base is white t-shirt and we have that:
     if (finalSuggestion.toLowerCase().includes('white')) {
-      setMatchingImage('/images/white-tshirt.jpg'); // You should dynamically match with wardrobe DB
+      setMatchingImage('/images/white-tshirt.jpg');
     } else {
       setMatchingImage(null);
     }
   };
 
-  useEffect(() => {
-    getLocationWeather(); // Auto-fetch on load
-  }, []);
-
   return (
     <div className="suggestions-wrapper">
-    <div className="suggestions-container">
-      <h2>What Should I Wear Today? 👗</h2>
+      <div className="suggestions-container">
+        <h2>What Should I Wear Today? 👗</h2>
 
-      {/* Search Box */}
-      <div>
-        <input
-          type="text"
-          placeholder="Search city..."
-          value={inputCity}
-          onChange={(e) => setInputCity(e.target.value)}
-        />
-        <button onClick={handleSearch}>Search</button>
-        <button onClick={getLocationWeather}>Use My Location</button>
+        {/* 🔍 Search Box */}
+        <div>
+          <input
+            type="text"
+            placeholder="Search city..."
+            value={inputCity}
+            onChange={(e) => setInputCity(e.target.value)}
+          />
+          <button onClick={handleSearch}>Search</button>
+          <button onClick={getLocationWeather}>Use My Location</button>
+        </div>
+
+        {/* ☀️ Weather Info */}
+        {weather && (
+          <div className="weather-info">
+            <h3>Weather in {city}</h3>
+            <p>🌡️ Temperature: {weather.main.temp}°C</p>
+            <p>☁️ Condition: {weather.weather[0].description}</p>
+          </div>
+        )}
+
+        {/* 🧠 Mood Dropdown */}
+        <div>
+          <label>Select Mood: </label>
+          <select value={mood} onChange={(e) => setMood(e.target.value)}>
+            <option value="">--Select--</option>
+            {moods.map((m, i) => (
+              <option key={i} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 🎯 Suggestion Action */}
+        <button onClick={handleSuggest}>Get Outfit Suggestion</button>
+
+        {/* 💡 Suggestion Text */}
+        {suggestion && (
+          <div className="suggestion-box">
+            <h4>💡 Suggestion:</h4>
+            <p>{suggestion}</p>
+          </div>
+        )}
+
+        {/* 🖼️ Wardrobe Match Image */}
+        {matchingImage && (
+          <div className="matching-image">
+            <h4>👚 Match from Your Wardrobe:</h4>
+            <img src={matchingImage} alt="Suggested from wardrobe" style={{ width: '200px' }} />
+          </div>
+        )}
+
+        {/* ✅ Optional: Show fetched suggestions (real-time) */}
+        {suggestions.length > 0 && (
+          <div className="real-time-feed">
+            <h4>🔥 Recent Suggestions</h4>
+            <ul>
+              {suggestions.map((s, index) => (
+                <li key={index}>{s.outfit || s.name || JSON.stringify(s)}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
-
-      {/* Weather Info */}
-      {weather && (
-        <div className="weather-info">
-          <h3>Weather in {city}</h3>
-          <p>🌡️ Temperature: {weather.main.temp}°C</p>
-          <p>☁️ Condition: {weather.weather[0].description}</p>
-        </div>
-      )}
-
-      {/* Mood Dropdown */}
-      <div>
-        <label>Select Mood: </label>
-        <select value={mood} onChange={(e) => setMood(e.target.value)}>
-          <option value="">--Select--</option>
-          {moods.map((m, i) => (
-            <option key={i} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Suggestion Button */}
-      <button onClick={handleSuggest}>Get Outfit Suggestion</button>
-
-      {/* Suggestion Box */}
-      {suggestion && (
-        <div className="suggestion-box">
-          <h4>💡 Suggestion:</h4>
-          <p>{suggestion}</p>
-        </div>
-      )}
-
-      {/* Matching Outfit Image */}
-      {matchingImage && (
-        <div className="matching-image">
-          <h4>👚 Match from Your Wardrobe:</h4>
-          <img src={matchingImage} alt="Suggested from wardrobe" style={{ width: '200px' }} />
-        </div>
-      )}
-    </div>
     </div>
   );
 }
