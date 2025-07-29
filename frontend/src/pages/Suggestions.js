@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getWardrobe, addOutfit } from "../api";
+
+
 
 import supabase from '../supabase';
 
