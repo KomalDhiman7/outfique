@@ -1,7 +1,13 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify
 
 suggestions_bp = Blueprint('suggestions', __name__)
 
-@suggestions_bp.route('/suggestions')
+@suggestions_bp.route('/api/suggestions', methods=['GET'])
 def get_suggestions():
-    return {"message": "Suggestions route is working!"}
+    return jsonify({
+        "suggestions": [
+            "White T-shirt + Blue Jeans",
+            "Summer Dress + Sandals",
+            "Tank Top + Shorts"
+        ]
+    })
