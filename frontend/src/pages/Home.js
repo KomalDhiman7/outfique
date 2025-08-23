@@ -3,7 +3,7 @@ import axios from 'axios';
 import './Home.css';
 
 const Home = ({ isDarkMode }) => {
-  const [username, setUsername] = useState('Komal');
+  const [username, setUsername] = useState('');
   const [mood, setMood] = useState('');
   const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState('feed');
