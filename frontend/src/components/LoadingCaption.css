@@ -1,0 +1,23 @@
+/* Uses theme variables */
+.lc-wrap {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  background: var(--page-gradient, var(--bg));
+  color: var(--text);
+  z-index: 2000;
+}
+.lc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+  display: flex; align-items: center; gap: 12px;
+}
+.lc-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 24px color-mix(in oklab, var(--primary) 60%, transparent);
+}
+.lc-text {
+  margin: 0; font-weight: 800; letter-spacing: .2px;
+}

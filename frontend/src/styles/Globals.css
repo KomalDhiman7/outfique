@@ -1,0 +1,45 @@
+/* src/styles/Globals.css */
+
+:root {
+  --bg: #FFE6F2;
+  --bg-accent: #FFD6EA;
+  --page-gradient: linear-gradient(180deg, #FFEAF5 0%, #FFE6F2 40%, #FFFFFF 100%);
+  --primary: #FF6FA3;
+  --surface: #FFFFFF;
+  --text: #2C2C2C;
+  --text-secondary: #6B7280;
+  --border: rgba(0,0,0,0.08);
+}
+
+/* Full-page backdrop (optional) */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--page-gradient, var(--bg));
+  transition: background 300ms ease;
+}
+
+/* Example usage of variables */
+.card {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-radius: 14px;
+}
+body.dark {
+  background: #121212;
+  color: #f9f9f9;
+}
+
+body.dark .suggestions-container {
+  background: #1e1e1e;
+  color: #f9f9f9;
+}
+
+body.dark button {
+  background: #444;
+  color: #fff;
+  border: 1px solid #666;
+}

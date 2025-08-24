@@ -1,105 +1,166 @@
+/* ---------- WRAPPER ---------- */
 .suggestions-wrapper {
-  background-image: url('https://i.pinimg.com/736x/cf/f0/3d/cff03def3865a35eeea2140b3d6bc2a8.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
   min-height: 100vh;
+  margin: 0;
   padding: 2rem;
-   margin: 0;
-  padding: 0;
   font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* Light mode background */
+  background-color: #ffe6f2;
+  background-image: url("https://i.pinimg.com/736x/cf/f0/3d/cff03def3865a35eeea2140b3d6bc2a8.jpg");
+  background-repeat: repeat;
+  background-size: 60px;
+}
+
+/* Dark mode background */
+body.dark .suggestions-wrapper {
+  background-color: #0d0d1a;
+  background-image: url("https://i.pinimg.com/736x/14/e0/e0/14e0e0ec52f56f7667c8fe8c60fb6a7b.jpg");
+  background-repeat: repeat;
+  background-size: 60px;
+}
+
+/* ---------- CONTAINER ---------- */
+/* 🌸 Light mode default */
+.suggestions-wrapper {
   background-color: #ffd6eb;
-  background-image: url('https://i.pinimg.com/736x/cf/f0/3d/cff03def3865a35eeea2140b3d6bc2a8.jpg');
+  background-image: url("https://i.pinimg.com/736x/cf/f0/3d/cff03def3865a35eeea2140b3d6bc2a8.jpg"); /* pink hearts */
   background-repeat: repeat;
   background-size: 80px;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-
+  transition: background 0.3s ease;
 }
 
+/* 🌙 Dark mode override */
+body.dark .suggestions-wrapper {
+  background-color: #0d0d0d;
+  background-image: url("https://i.pinimg.com/736x/14/e0/e0/14e0e0ec52f56f7667c8fe8c60fb6a7b.jpg"); /* blue lips */
+  background-repeat: repeat;
+  background-size: 80px;
+}
 
+/* Center card */
 .suggestions-container {
-  max-width: 640px;
-  margin: 2rem auto;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-
-  
-}
-
-.suggestions-container h2 {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
-  margin-bottom: 1rem;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-.suggestions-container input[type="text"] {
-  width: calc(100% - 140px);
-  padding: 0.5rem;
-  border: 2px solid var(--accent-color);
-  border-radius: 8px 0 0 8px;
-  font-size: 1rem;
+/* Dark mode card */
+body.dark .suggestions-container {
+  background: #1e1e1e;
+  color: #f5f5f5;
 }
 
-.suggestions-container .action-buttons {
-  display: inline-flex;
-}
-
-.suggestions-container button {
-  padding: 0.5rem 1rem;
-  border: none;
-  background-color: var(--accent-color);
-  color: #fff;
+/* Buttons & inputs */
+.suggestions-container button,
+.suggestions-container input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 2px solid #ff4da6;
+  border-radius: 8px;
+  background: transparent;
+  color: #ff4da6;
+  font-size: 16px;
   cursor: pointer;
-  font-weight: bold;
-  border-radius: 0 8px 8px 0;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
-/* .suggestions-container button:hover {
-  background-color: darken(var(--accent-color), 10%);
-} */
+.suggestions-container button:hover,
+.suggestions-container input:focus {
+  background: #ff4da6;
+  color: #fff;
+  outline: none;
+}
 
+/* Dark mode buttons */
+body.dark .suggestions-container button,
+body.dark .suggestions-container input {
+  border-color: #4da6ff;
+  color: #4da6ff;
+}
+
+body.dark .suggestions-container button:hover,
+body.dark .suggestions-container input:focus {
+  background: #4da6ff;
+  color: #fff;
+}
+
+
+.suggestions-container input:focus,
+.suggestions-container select:focus {
+  outline: none;
+  border-color: #ff1493;
+  box-shadow: 0 0 6px rgba(255, 20, 147, 0.4);
+}
+
+/* ---------- BUTTONS ---------- */
+.suggestions-container button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border-radius: 12px;
+  border: 2px solid #ff69b4;
+  background: white;
+  color: #ff1493;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.suggestions-container button:hover {
+  background: #ff69b4;
+  color: white;
+}
+
+/* Dark mode button */
+body.dark .suggestions-container button {
+  background: #1a1a2e;
+  color: #ff69b4;
+}
+body.dark .suggestions-container button:hover {
+  background: #ff69b4;
+  color: white;
+}
+
+/* ---------- WEATHER INFO ---------- */
 .weather-info {
   margin: 1.5rem 0;
   padding: 1rem;
-  background-color: var(--accent-color + '20');
-  border-radius: 8px;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  background-color: #ffe6f2;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.weather-info h3 {
-  margin-bottom: 0.5rem;
+body.dark .weather-info {
+  background-color: #16213e;
 }
 
-.suggestions-container label {
-  display: block;
-  margin: 1rem 0 0.5rem;
-  font-weight: bold;
-}
-
-.suggestions-container select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 2px solid var(--accent-color);
-  border-radius: 8px;
-}
-
+/* ---------- SUGGESTION BOX ---------- */
 .suggestion-box,
 .matching-image {
   margin: 1.5rem 0;
   padding: 1rem;
-  border-radius: 8px;
-  background-color: var(--bg-color);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  border-radius: 12px;
+  background-color: #fafafa;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.suggestion-box p {
-  margin: 0.5rem 0 0;
+body.dark .suggestion-box,
+body.dark .matching-image {
+  background-color: #222831;
 }
 
 .matching-image img {

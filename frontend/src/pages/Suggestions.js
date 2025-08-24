@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { getWardrobe, addOutfit } from "../api";
-
-
-
-import supabase from '../supabase';
+import { supabase } from '../supabase';
 
 import './Suggestions.css';
 
@@ -15,15 +11,30 @@ function Suggestions() {
   const [mood, setMood] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [matchingImage, setMatchingImage] = useState(null);
-  const [suggestions, setSuggestions] = useState([]); // FIXED
+  const [suggestions, setSuggestions] = useState([]); 
+  const [darkMode, setDarkMode] = useState(false); // 🌙 local dark mode toggle
 
   const moods = ['Party', 'Fun', 'Sleep', 'Happy', 'Beach', 'Mountains'];
   const API_KEY = '56c845eb908d61f92aebecf35d8b7802';
 
+  // ✅ Toggle function
+  const toggleTheme = () => {
+    setDarkMode((prev) => !prev);
+  };
+
+  // ✅ Apply/remove .dark class on <body>
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }, [darkMode]);
+
   // ✅ 1. FETCH SUGGESTIONS
   const fetchSuggestions = async () => {
     try {
-      const res = await axios.get('/api/suggestions'); // or full URL
+      const res = await axios.get('/api/suggestions');
       setSuggestions(res.data);
       console.log('Suggestions fetched:', res.data);
     } catch (err) {
@@ -122,6 +133,11 @@ function Suggestions() {
     <div className="suggestions-wrapper">
       <div className="suggestions-container">
         <h2>What Should I Wear Today? 👗</h2>
+
+        {/* 🌙 Theme Toggle */}
+        <button onClick={toggleTheme} style={{ marginBottom: '1rem' }}>
+          {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+        </button>
 
         {/* 🔍 Search Box */}
         <div>

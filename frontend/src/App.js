@@ -10,7 +10,7 @@ import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { ThemeProvider } from './ThemeContext';
-import supabase from './supabase';
+import { supabase } from './supabase';
 import './App.css';
 
 function App() {
@@ -39,6 +39,7 @@ function App() {
       <Router>
         {user && <Navbar user={user} />}
         <div className="main-content">
+          <div className="app-bg" />
           <Routes>
             {!user ? (
               <>
