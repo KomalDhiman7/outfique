@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { useTheme } from '../ThemeContext';
 import {
   HomeOutlined,
-  SearchOutlined,
+  CheckroomOutlined,   // ✅ Drip (wardrobe/clothing-like icon)
   LightbulbOutlined,
   NotificationsNoneOutlined,
   PersonOutline,
@@ -15,9 +15,10 @@ import './Navbar.css';
 function Navbar({ user }) {
   const { theme, toggleTheme, colors } = useTheme();
 
+  // ✅ Updated links: removed Search, added Drip (2nd place)
   const links = [
     { to: '/', label: 'Home', Icon: HomeOutlined, exact: true },
-    { to: '/search', label: 'Search', Icon: SearchOutlined },
+    { to: '/drip', label: 'Drip', Icon: CheckroomOutlined },
     { to: '/suggestions', label: 'Suggestions', Icon: LightbulbOutlined },
     { to: '/notifications', label: 'Notifications', Icon: NotificationsNoneOutlined },
     { to: '/profile', label: 'Profile', Icon: PersonOutline },
@@ -29,7 +30,10 @@ function Navbar({ user }) {
       style={{
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
-        background: theme === 'light' ? 'rgba(255,255,255,0.55)' : 'rgba(22, 33, 62, 0.55)',
+        background:
+          theme === 'light'
+            ? 'rgba(255,255,255,0.55)'
+            : 'rgba(22, 33, 62, 0.55)',
         borderBottom: `1px solid ${colors.border}`,
       }}
     >
@@ -73,7 +77,10 @@ function Navbar({ user }) {
             {theme === 'light' ? '🌙' : '🌞'}
           </button>
 
-          <NavLink to="/settings" className="ghost-btn" title="Settings"
+          <NavLink
+            to="/settings"
+            className="ghost-btn"
+            title="Settings"
             style={{ color: colors.textSecondary, borderColor: colors.border }}
           >
             <SettingsOutlined />

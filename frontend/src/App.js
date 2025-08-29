@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
+import Drip from './pages/Drip'; // ✅ new page
 import Suggestions from './pages/Suggestions';
 import Wardrobe from './pages/Wardrobe';
 import Notifications from './pages/Notifications';
@@ -50,6 +51,7 @@ function App() {
             ) : (
               <>
                 <Route path="/" element={<Home />} />
+                <Route path="/drip" element={<Drip />} />  {/* ✅ new drip tab (2nd place) */}
                 <Route path="/suggestions" element={<Suggestions />} />
                 <Route path="/wardrobe" element={<Wardrobe />} />
                 <Route path="/notifications" element={<Notifications />} />
