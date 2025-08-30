@@ -1,42 +1,37 @@
 from flask import Blueprint, request, jsonify
-from werkzeug.utils import secure_filename
-import os
+import requests
+import random
 
 drip_bp = Blueprint("drip", __name__)
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")  # absolute safe path
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
-
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 @drip_bp.route("/api/drip", methods=["POST"])
-def upload_drip():
-    if "file" not in request.files:
-        return jsonify({"error": "No file provided"}), 400
+def drip():
+    data = request.get_json()
+    image_url = data.get("image_url")
 
-    file = request.files["file"]
+    if not image_url:
+        return jsonify({"error": "No image URL provided"}), 400
 
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        file.save(filepath)
+    # ✅ Download image for processing
+    try:
+        response = requests.get(image_url, stream=True)
+        if response.status_code != 200:
+            return jsonify({"error": "Could not download image"}), 400
+    except Exception as e:
+        return jsonify({"error": f"Failed to fetch image: {str(e)}"}), 500
 
-        # TODO: Replace with AI logic (e.g. OpenCV + ML)
-        suggestion = {
-            "rating": 4,
-            "recommended_item": {
-                "name": "White Cotton T-Shirt",
-                "image": "https://assets.myntassets.com/h_720,q_90,w_540/v1/assets/images/34670653/2025/1/20/36ffddbf-0a3d-41c2-9146-9602b4ff0efb1737355108921-DressBerry-Women-Bio-Finish-Solid-Round-Neck-Cotton-Slim-Fit--1.jpg",
-                "link": "https://www.myntra.com/tshirts/dressberry/dressberry-women-bio-finish-solid-round-neck-cotton-slim-fit-t-shirt/34670653/buy"
-            }
-        }
+    # TODO: add real OpenCV analysis here
+    # For now, fake drip rating
+    drip_rating = random.randint(2, 5)
 
-        return jsonify({"success": True, "suggestion": suggestion})
+    # Example recommendation
+    suggestion = {
+        "rating": drip_rating,
+        "recommended_item": {
+            "name": "Sky Blue Wide-Leg Jeans",
+            "image": "https://assets.myntassets.com/fake-jeans.jpg",
+            "link": "https://www.myntra.com/fake-jeans",
+        },
+    }
 
-    return jsonify({"error": "Invalid file format"}), 400
+    return jsonify({"suggestion": suggestion})

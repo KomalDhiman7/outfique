@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { supabase } from "../supabase"; // make sure supabase client is set up
 import axios from "axios";
 import "./Drip.css";
 
@@ -22,23 +23,32 @@ function Drip() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
       setLoading(true);
-      // ✅ Works with proxy ("proxy": "http://localhost:5000") in package.json
-      // Or fallback to explicit backend URL
-      const res = await axios.post("/api/drip", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+
+      // ✅ Step 1: Upload file to Supabase storage
+      const fileName = `drip/${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage
+        .from("wardrobe") // 👈 your Supabase bucket name
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      // ✅ Step 2: Get public URL
+      const { data } = supabase.storage
+        .from("wardrobe")
+        .getPublicUrl(fileName);
+
+      const publicUrl = data.publicUrl;
+
+      // ✅ Step 3: Send image URL to Flask for analysis
+      const res = await axios.post("http://localhost:5000/api/drip", {
+        image_url: publicUrl,
       });
+
       setSuggestion(res.data.suggestion);
     } catch (err) {
-      if (err.response && err.response.data.error) {
-        alert("❌ " + err.response.data.error);
-      } else {
-        alert("❌ Upload failed: " + err.message);
-      }
+      alert("❌ Upload failed: " + err.message);
     } finally {
       setLoading(false);
     }

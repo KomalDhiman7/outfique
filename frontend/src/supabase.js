@@ -45,7 +45,7 @@ export const wardrobeHelpers = {
     const fileName = `${userId}/${Date.now()}.${fileExt}`
     
     const { error: uploadError } = await supabase.storage
-      .from('wardrobe-items')
+      .from('wardrobe')
       .upload(fileName, file)
 
     if (uploadError) return { error: uploadError }
