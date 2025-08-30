@@ -18,20 +18,20 @@ from backend.routes.suggestions import suggestions_bp
 from backend.routes.drip import drip_bp
 
 
-
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
     # Allow credentials for frontend-backend sessions
-    CORS(app, supports_credentials=True)
+    CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
     # Initialize extensions
     db.init_app(app)
     JWTManager(app)
 
     # Ensure upload folder exists
-    os.makedirs(app.config.get('UPLOAD_FOLDER', 'uploads'), exist_ok=True)
+    upload_folder = app.config.get("UPLOAD_FOLDER", "uploads")
+    os.makedirs(upload_folder, exist_ok=True)
 
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -42,14 +42,14 @@ def create_app():
     app.register_blueprint(notifications_bp, url_prefix='/api/notifications')
     app.register_blueprint(social_bp, url_prefix='/api/social')
     app.register_blueprint(profile_bp, url_prefix='/api/profile')
-    app.register_blueprint(drip_bp)
+    app.register_blueprint(drip_bp, url_prefix="/api")
 
     # Simple health check
     @app.route('/')
     def index():
         return {"status": "ok"}
 
-    # Create tables (if not using migrations yet)
+    # Create tables (for dev only)
     with app.app_context():
         db.create_all()
 

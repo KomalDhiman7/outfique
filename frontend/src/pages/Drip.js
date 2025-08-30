@@ -1,21 +1,24 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./Drip.css";
 
 function Drip() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [dripScore, setDripScore] = useState(null);
-  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [suggestion, setSuggestion] = useState(null);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-    setPreview(URL.createObjectURL(selectedFile));
+    if (selectedFile) {
+      setPreview(URL.createObjectURL(selectedFile));
+    }
   };
 
   const handleUpload = async () => {
     if (!file) {
-      alert("Please select an image first!");
+      alert("📷 Please upload an image first!");
       return;
     }
 
@@ -23,19 +26,21 @@ function Drip() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/drip", {
-        method: "POST",
-        body: formData,
+      setLoading(true);
+      // ✅ Works with proxy ("proxy": "http://localhost:5000") in package.json
+      // Or fallback to explicit backend URL
+      const res = await axios.post("/api/drip", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-
-      if (!res.ok) throw new Error("Upload failed");
-
-      const data = await res.json();
-      setDripScore(data.drip_score);
-      setSuggestions(data.suggestions);
+      setSuggestion(res.data.suggestion);
     } catch (err) {
-      alert("Error uploading image ❌");
-      console.error(err);
+      if (err.response && err.response.data.error) {
+        alert("❌ " + err.response.data.error);
+      } else {
+        alert("❌ Upload failed: " + err.message);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,46 +48,36 @@ function Drip() {
     <div className="drip-container">
       <h2 className="drip-title">✨ Rate Your Drip ✨</h2>
 
-      <div className="upload-box">
-        {preview ? (
-          <img src={preview} alt="Preview" className="preview-img" />
-        ) : (
-          <p className="upload-placeholder">Upload your outfit photo</p>
+      <div className="upload-section">
+        <input type="file" accept="image/*" onChange={handleFileChange} />
+        {preview && (
+          <div className="preview-box">
+            <img src={preview} alt="Preview" />
+          </div>
         )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="file-input"
-        />
-        <button className="upload-btn" onClick={handleUpload}>
-          Get Drip Score
+        <button className="upload-btn" onClick={handleUpload} disabled={loading}>
+          {loading ? "⏳ Checking..." : "Get Drip Score"}
         </button>
       </div>
 
-      {dripScore !== null && (
-        <div className="drip-score">
-          <h3>Your Drip Score</h3>
-          <p className="score">{dripScore} / 100</p>
-        </div>
-      )}
-
-      {suggestions.length > 0 && (
-        <div className="suggestions">
-          <h3>🔥 Style Suggestions</h3>
-          <div className="suggestion-list">
-            {suggestions.map((s, i) => (
-              <a
-                key={i}
-                href={s.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="suggestion-item"
-              >
-                <img src={s.image} alt={s.item} />
-                <p>{s.item}</p>
-              </a>
-            ))}
+      {suggestion && (
+        <div className="suggestion-box">
+          <h3>⭐ Outfit Rating: {suggestion.rating}/5</h3>
+          <p>
+            Try adding: <b>{suggestion.recommended_item.name}</b>
+          </p>
+          <div className="product-card">
+            <img
+              src={suggestion.recommended_item.image}
+              alt={suggestion.recommended_item.name}
+            />
+            <a
+              href={suggestion.recommended_item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="myntra-btn">🛍 Buy on Myntra</button>
+            </a>
           </div>
         </div>
       )}
