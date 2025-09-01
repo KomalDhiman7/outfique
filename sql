@@ -38,3 +38,12 @@ CREATE TABLE comments (
   content TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+notifications
+-------------
+id (int, pk)
+user_id (who receives it)
+type (like, comment, follow)
+message (text, e.g., "Komal liked your post")
+created_at (timestamp)
+is_read (boolean default false)
