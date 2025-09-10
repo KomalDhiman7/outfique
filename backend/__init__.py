@@ -1,55 +1,47 @@
-from flask import Flask
-from flask_cors import CORS
-from flask_jwt_extended import JWTManager
+# backend/__init__.py
 import os
+from pathlib import Path
+from flask import Flask, jsonify
+from .config import get_config_class
+from .extensions import db, migrate, cors
 
-from backend.config import Config
-from backend.app_extensions import db
-
-# Blueprints
-from backend.routes.posts import posts_bp
-from backend.routes.social import social_bp
-from backend.routes.notifications import notifications_bp
-from backend.routes.profile import profile_bp
-from backend.routes.auth import auth_bp
-from backend.routes.user import user_bp
-from backend.routes.wardrobe import wardrobe_bp
-from backend.routes.suggestions import suggestions_bp
-from backend.routes.drip import drip_bp
-
-
-def create_app():
+def create_app() -> Flask:
     app = Flask(__name__)
-    app.config.from_object(Config)
 
-    # Allow credentials for frontend-backend sessions
-    CORS(app, supports_credentials=True)
+    config_name = os.getenv("FLASK_CONFIG", "development")
+    app.config.from_object(get_config_class(config_name))
 
-    # Initialize extensions
+    upload_dir = Path(app.config.get("UPLOAD_FOLDER", "./backend/uploads"))
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
     db.init_app(app)
-    JWTManager(app)
+    migrate.init_app(app, db)
+    cors.init_app(
+        app,
+        resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", ["http://localhost:3000", "http://localhost:5173"])}},
+        supports_credentials=True,
+    )
 
-    # Ensure upload folder exists
-    os.makedirs(app.config.get('UPLOAD_FOLDER', 'uploads'), exist_ok=True)
+    from .auth import auth_bp
+    from .wardrobe import wardrobe_bp
+    from .suggestions import suggestions_bp
+    from .drip import drip_bp
 
-    # Register blueprints
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(wardrobe_bp, url_prefix='/api/wardrobe')
-    app.register_blueprint(posts_bp, url_prefix='/api/posts')
-    app.register_blueprint(suggestions_bp, url_prefix='/api/suggestions')
-    app.register_blueprint(user_bp, url_prefix='/api/user')
-    app.register_blueprint(notifications_bp, url_prefix='/api/notifications')
-    app.register_blueprint(social_bp, url_prefix='/api/social')
-    app.register_blueprint(profile_bp, url_prefix='/api/profile')
-    app.register_blueprint(drip_bp, url_prefix='/api/drip')  # ✅ important: url_prefix added
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(wardrobe_bp, url_prefix="/api/wardrobe")
+    app.register_blueprint(suggestions_bp, url_prefix="/api/suggestions")
+    app.register_blueprint(drip_bp, url_prefix="/api/drip")
 
-    # Simple health check
-    @app.route('/')
-    def index():
-        return {"status": "ok"}
+    @app.get("/api/health")
+    def health() -> tuple[dict, int]:
+        return {"status": "ok"}, 200
 
-    # Create tables (if not using migrations yet)
-    with app.app_context():
-        db.create_all()
+    @app.errorhandler(404)
+    def not_found(_: Exception):
+        return jsonify({"error": "Not found"}), 404
+
+    @app.errorhandler(500)
+    def server_error(err: Exception):
+        return jsonify({"error": "Server error", "detail": str(err)}), 500
 
     return app

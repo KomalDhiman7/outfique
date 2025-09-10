@@ -154,7 +154,7 @@ function PinkyPromiseCaptcha({ setCaptchaSelected, captchaSelected }) {
         draggable="false"
       />
       {captchaSelected === 'dog' && (
-        <div className="captcha-success-msg">Pinky promise made!</div>
+        <div className="captcha-success-msg">Success!</div>
       )}
     </div>
   );

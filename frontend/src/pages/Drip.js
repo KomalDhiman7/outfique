@@ -1,6 +1,7 @@
+// src/pages/Drip.js
 import React, { useState } from "react";
-import { supabase } from "../supabase"; // make sure supabase client is set up
-import axios from "axios";
+import { supabase } from "../supabase";
+import { rateDrip } from "../api";
 import "./Drip.css";
 
 function Drip() {
@@ -12,41 +13,49 @@ function Drip() {
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
-    if (selectedFile) {
-      setPreview(URL.createObjectURL(selectedFile));
-    }
+    if (selectedFile) setPreview(URL.createObjectURL(selectedFile));
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      alert("📷 Please upload an image first!");
-      return;
-    }
+    if (!file) return alert("📷 Please upload an image first!");
 
     try {
       setLoading(true);
 
-      // ✅ Step 1: Upload file to Supabase storage
-      const fileName = `drip/${Date.now()}-${file.name}`;
-      const { error } = await supabase.storage
-        .from("wardrobe") // 👈 your Supabase bucket name
+      const user = supabase.auth.getUser?.() || supabase.auth.user?.();
+      if (!user) throw new Error("User not logged in");
+
+      // 1️⃣ Upload file to Supabase Storage
+      const fileExt = file.name.split(".").pop();
+      const fileName = `wardrobe/${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("wardrobe")
         .upload(fileName, file);
 
-      if (error) throw error;
+      if (uploadError) throw uploadError;
 
-      // ✅ Step 2: Get public URL
-      const { data } = supabase.storage
-        .from("wardrobe")
-        .getPublicUrl(fileName);
+      // 2️⃣ Insert into wardrobe_items table to get item_id
+      const { data: itemData, error: insertError } = await supabase
+        .from("wardrobe_items")
+        .insert({
+          user_id: user.id,
+          image_path: fileName,
+          category: "unclassified",
+          created_at: new Date(),
+        })
+        .select();
 
-      const publicUrl = data.publicUrl;
+      if (insertError || !itemData?.length) throw insertError || new Error("Failed to insert wardrobe item");
 
-      // ✅ Step 3: Send image URL to Flask for analysis
-      const res = await axios.post("http://localhost:5000/api/drip", {
-        image_url: publicUrl,
-      });
+      const itemId = itemData[0].id;
 
-      setSuggestion(res.data.suggestion);
+      // 3️⃣ Send item_id to backend /api/drip/rate
+      const token = localStorage.getItem("token"); // adjust if you store token differently
+      const result = await rateDrip(token, [itemId], "Clear", "Happy");
+
+      setSuggestion(result);
+
     } catch (err) {
       alert("❌ Upload failed: " + err.message);
     } finally {
@@ -74,21 +83,23 @@ function Drip() {
         <div className="suggestion-box">
           <h3>⭐ Outfit Rating: {suggestion.rating}/5</h3>
           <p>
-            Try adding: <b>{suggestion.recommended_item.name}</b>
+            Try adding: <b>{suggestion.recommended_item?.name}</b>
           </p>
-          <div className="product-card">
-            <img
-              src={suggestion.recommended_item.image}
-              alt={suggestion.recommended_item.name}
-            />
-            <a
-              href={suggestion.recommended_item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <button className="myntra-btn">🛍 Buy on Myntra</button>
-            </a>
-          </div>
+          {suggestion.recommended_item && (
+            <div className="product-card">
+              <img
+                src={suggestion.recommended_item.image}
+                alt={suggestion.recommended_item.name}
+              />
+              <a
+                href={suggestion.recommended_item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="myntra-btn">🛍 Buy on Myntra</button>
+              </a>
+            </div>
+          )}
         </div>
       )}
     </div>
