@@ -6,46 +6,34 @@ from .utils.color import colors_harmonize
 
 drip_bp = Blueprint("drip", __name__)
 
-@drip_bp.post("/rate")
-@require_auth
+@drip_bp.route("/rate", methods=["POST"])
+@jwt_required()
 def rate_drip():
-    data = request.get_json() or {}
-    item_ids = data.get("item_ids") or {}
-    weather = data.get("weather") or {}
-    mood = (data.get("mood") or "").lower()
+    user_id = get_jwt_identity()
+    data = request.get_json()
 
-    top = WardrobeItem.query.filter_by(user_id=request.user.id, id=item_ids.get("top_id")).first() if item_ids.get("top_id") else None
-    bottom = WardrobeItem.query.filter_by(user_id=request.user.id, id=item_ids.get("bottom_id")).first() if item_ids.get("bottom_id") else None
-    shoes = WardrobeItem.query.filter_by(user_id=request.user.id, id=item_ids.get("shoes_id")).first() if item_ids.get("shoes_id") else None
-    outer = WardrobeItem.query.filter_by(user_id=request.user.id, id=item_ids.get("outer_id")).first() if item_ids.get("outer_id") else None
+    item_ids = data.get("item_ids", [])
+    weather = data.get("weather")
+    mood = data.get("mood")
 
-    completeness = sum(1 for x in [top, bottom, shoes] if x)
-    base_score = completeness / 3 * 60
+    # Fetch wardrobe items from DB
+    items = WardrobeItem.query.filter(
+        WardrobeItem.id.in_(item_ids),
+        WardrobeItem.user_id == user_id
+    ).all()
 
-    harmony_score = 20
-    if top and bottom:
-        tcol = (top.features or {}).get("dominant_colors") or []
-        bcol = (bottom.features or {}).get("dominant_colors") or []
-        if tcol and bcol:
-            harmony_score = max(colors_harmonize(tuple(tcol[0]), tuple(bcol[0])), 20)
-            harmony_score = min(100, harmony_score)
-    base_score += (harmony_score * 0.3)
+    if not items:
+        return jsonify({"error": "No valid wardrobe items found"}), 400
 
-    temp = float((weather or {}).get("temp_c") or 22.0)
-    weather_bonus = 0
-    if temp < 15 and outer: weather_bonus += 10
-    if temp > 28 and not outer: weather_bonus += 5
-    base_score += weather_bonus
+    # Dummy scoring logic (replace with your ML/AI later)
+    score = 4  # example
+    recommended_item = {
+        "name": "Sky Blue Jeans",
+        "image": "https://via.placeholder.com/150",
+        "link": "https://www.myntra.com",
+    }
 
-    mood_bonus = 0
-    if mood in {"formal"} and outer: mood_bonus += 5
-    if mood in {"party", "date"} and shoes: mood_bonus += 5
-    base_score += mood_bonus
-
-    score = int(max(0, min(100, base_score)))
-    reasons = []
-    if completeness < 3: reasons.append("Outfit incomplete")
-    if weather_bonus > 0: reasons.append("Weather-appropriate")
-    if mood_bonus > 0: reasons.append("Matches mood")
-
-    return {"score": score, "reasons": reasons}, 200
+    return jsonify({
+        "rating": score,
+        "recommended_item": recommended_item
+    })

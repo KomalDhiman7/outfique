@@ -17,51 +17,68 @@ function Drip() {
   };
 
   const handleUpload = async () => {
-    if (!file) return alert("📷 Please upload an image first!");
+  if (!file) return alert("📷 Please upload an image first!");
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const user = supabase.auth.getUser?.() || supabase.auth.user?.();
-      if (!user) throw new Error("User not logged in");
+    // 1. Upload file to Supabase
+    const fileName = `drip/${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage
+      .from("wardrobe")
+      .upload(fileName, file);
 
-      // 1️⃣ Upload file to Supabase Storage
-      const fileExt = file.name.split(".").pop();
-      const fileName = `wardrobe/${user.id}/${Date.now()}.${fileExt}`;
+    if (error) throw error;
 
-      const { error: uploadError } = await supabase.storage
-        .from("wardrobe")
-        .upload(fileName, file);
+    // 2. Get public URL
+    const { data } = supabase.storage.from("wardrobe").getPublicUrl(fileName);
+    const publicUrl = data.publicUrl;
 
-      if (uploadError) throw uploadError;
+    // 3. Insert into wardrobe_items via backend
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"}/api/wardrobe/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        image_url: publicUrl,
+        category: "top", // optional → let user pick later
+        color: "unknown",
+        notes: "uploaded via Drip",
+      }),
+    });
 
-      // 2️⃣ Insert into wardrobe_items table to get item_id
-      const { data: itemData, error: insertError } = await supabase
-        .from("wardrobe_items")
-        .insert({
-          user_id: user.id,
-          image_path: fileName,
-          category: "unclassified",
-          created_at: new Date(),
-        })
-        .select();
+    if (!res.ok) throw new Error("Failed to add wardrobe item");
+    const newItem = await res.json();
 
-      if (insertError || !itemData?.length) throw insertError || new Error("Failed to insert wardrobe item");
+    // 4. Call backend drip rating API with item_id
+    const result = await rateDrip(token, [newItem.id], "Clear", "Happy");
 
-      const itemId = itemData[0].id;
+    setSuggestion(result);
+  } catch (err) {
+    alert("❌ Upload failed: " + err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
-      // 3️⃣ Send item_id to backend /api/drip/rate
-      const token = localStorage.getItem("token"); // adjust if you store token differently
-      const result = await rateDrip(token, [itemId], "Clear", "Happy");
 
-      setSuggestion(result);
+    //  const itemId = itemData[0].id;
 
-    } catch (err) {
-      alert("❌ Upload failed: " + err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     // 3️⃣ Send item_id to backend /api/drip/rate
+  //     const token = localStorage.getItem("token"); // adjust if you store token differently
+  //     const result = await rateDrip(token, [itemId], "Clear", "Happy");
+
+  //     setSuggestion(result);
+
+  //   } catch (err) {
+  //     alert("❌ Upload failed: " + err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <div className="drip-container">

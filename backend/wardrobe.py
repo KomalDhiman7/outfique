@@ -54,6 +54,31 @@ def upload_item():
     save_instance(item)
     return {"id": item.id, "message": "uploaded"}, 201
 
+@wardrobe_bp.route("/add", methods=["POST"])
+@jwt_required()
+def add_outfit():
+    user_id = get_jwt_identity()
+    data = request.json
+
+    new_item = WardrobeItem(
+        user_id=user_id,
+        image_url=data.get("image_url"),
+        category=data.get("category"),
+        color=data.get("color"),
+        notes=data.get("notes"),
+    )
+    db.session.add(new_item)
+    db.session.commit()
+
+    return jsonify({
+        "id": new_item.id,
+        "image_url": new_item.image_url,
+        "category": new_item.category,
+        "color": new_item.color,
+        "notes": new_item.notes
+    }), 201
+
+
 @wardrobe_bp.get("/items")
 @require_auth
 def list_items():

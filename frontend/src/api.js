@@ -2,26 +2,9 @@
 
 // Detect backend URL depending on environment
 const API =
-  process.env.REACT_APP_API_BASE_URL || // CRA (Create React App)
-  (typeof import.meta !== "undefined" ? import.meta.env?.VITE_API_BASE_URL : null) || // Vite (optional fallback)
+  process.env.REACT_APP_API_BASE_URL || // CRA
+  (typeof import.meta !== "undefined" ? import.meta.env?.VITE_API_BASE_URL : null) || // Vite
   "http://localhost:5000";
-
-// ---------- Wardrobe ----------
-export const getWardrobe = async () => {
-  const res = await fetch(`${API}/wardrobe/all`);
-  if (!res.ok) throw new Error("Failed to fetch wardrobe");
-  return res.json();
-};
-
-export const addOutfit = async (outfitData) => {
-  const res = await fetch(`${API}/wardrobe/add`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(outfitData),
-  });
-  if (!res.ok) throw new Error("Failed to add outfit");
-  return res.json();
-};
 
 // ---------- Auth ----------
 export async function login(email, password) {
@@ -34,33 +17,30 @@ export async function login(email, password) {
   return res.json();
 }
 
-// ---------- Wardrobe Items ----------
-export async function listItems(token) {
+// ---------- Wardrobe ----------
+export const getWardrobe = async (token) => {
   const res = await fetch(`${API}/api/wardrobe/items`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Fetch items failed");
+  if (!res.ok) throw new Error("Failed to fetch wardrobe");
   return res.json();
-}
+};
 
-// ---------- Upload Cloth (Drip Section) ----------
-export async function uploadCloth(token, file, { category, color, notes }) {
-  const form = new FormData();
-  form.append("file", file);
-  if (category) form.append("category", category);
-  if (color) form.append("color", color);
-  if (notes) form.append("notes", notes);
-
-  const res = await fetch(`${API}/api/wardrobe/upload`, {
+// Add an outfit to wardrobe (returns the new item with ID)
+export const addOutfit = async (token, outfitData) => {
+  const res = await fetch(`${API}/api/wardrobe/add`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(outfitData),
   });
-  if (!res.ok) throw new Error("Upload failed");
-  return res.json();
-}
+  if (!res.ok) throw new Error("Failed to add outfit");
+  return res.json(); // should include { id, image_url, category, ... }
+};
 
-// ---------- Get Pairings + Affiliate Links ----------
+// ---------- Suggestions ----------
 export async function getPairings(token, itemId) {
   const res = await fetch(`${API}/api/suggestions/pairings?item_id=${itemId}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -69,7 +49,7 @@ export async function getPairings(token, itemId) {
   return res.json();
 }
 
-// ---------- Rate Drip ----------
+// ---------- Drip ----------
 export async function rateDrip(token, itemIds, weather, mood) {
   const res = await fetch(`${API}/api/drip/rate`, {
     method: "POST",
