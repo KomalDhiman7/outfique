@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, abort
-from backend.app_extensions import db
+from backend.extensions import db
 from backend.models.user import User
 from backend.models.social import Follow, Like, Save, Comment
 from backend.models.post import Post

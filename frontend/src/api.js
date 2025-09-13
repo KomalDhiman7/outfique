@@ -26,6 +26,26 @@ export const getWardrobe = async (token) => {
   return res.json();
 };
 
+
+// ---------- Upload Cloth (via Cloudinary backend) ----------
+export async function uploadCloth(token, file, { category, color, notes }) {
+  const form = new FormData();
+  form.append("file", file);
+  if (category) form.append("category", category);
+  if (color) form.append("color", color);
+  if (notes) form.append("notes", notes);
+
+  const res = await fetch(`${API}/api/wardrobe/upload`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+
+  if (!res.ok) throw new Error("Upload failed");
+  return res.json();
+}
+
+
 // Add an outfit to wardrobe (returns the new item with ID)
 export const addOutfit = async (token, outfitData) => {
   const res = await fetch(`${API}/api/wardrobe/add`, {
