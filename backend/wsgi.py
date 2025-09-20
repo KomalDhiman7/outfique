@@ -1,3 +1,3 @@
 # backend/wsgi.py
-from . import create_app
+from backend import create_app
 app = create_app()

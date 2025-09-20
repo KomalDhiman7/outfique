@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from flask import Flask, jsonify
 from .config import get_config_class
-from .extensions import db, migrate, cors
+from .extensions import db, migrate 
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -16,16 +16,12 @@ def create_app() -> Flask:
 
     db.init_app(app)
     migrate.init_app(app, db)
-    cors.init_app(
-        app,
-        resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", ["http://localhost:3000", "http://localhost:5173"])}},
-        supports_credentials=True,
-    )
 
-    from .auth import auth_bp
-    from .wardrobe import wardrobe_bp
-    from .suggestions import suggestions_bp
-    from .drip import drip_bp
+    from .routes.wardrobe import wardrobe_bp
+    from .routes.auth import auth_bp
+    from .routes.wardrobe import wardrobe_bp
+    from .routes.suggestions import suggestions_bp
+    from .routes.drip import drip_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(wardrobe_bp, url_prefix="/api/wardrobe")

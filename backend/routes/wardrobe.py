@@ -18,11 +18,26 @@ def upload_item():
         upload_result = cloudinary.uploader.upload(file)
         image_url = upload_result["secure_url"]
 
-        # TODO: Save image_url + user_id + metadata into DB
+        # Save image_url + user_id + metadata into DB
+        from models import WardrobeItem
+        from extensions import db
+        category = request.form.get("category")
+        color = request.form.get("color")
+        notes = request.form.get("notes")
+        item = WardrobeItem(
+            user_id=user_id,
+            category=category or "other",
+            color=color,
+            image_path=image_url,
+            notes=notes
+        )
+        db.session.add(item)
+        db.session.commit()
 
         return jsonify({
             "message": "Uploaded successfully ✅",
-            "image_url": image_url
+            "image_url": image_url,
+            "item_id": item.id
         }), 200
 
     except Exception as e:
