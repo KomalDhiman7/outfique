@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
-from models import User, Post, Follow
-from utils import current_user_id
+from backend.models import User, Post, Follow
+from backend.utils import current_user_id
 
 
 profile_bp = Blueprint('profile', __name__)

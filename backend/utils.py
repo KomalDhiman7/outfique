@@ -1,6 +1,6 @@
 from flask import request, abort
-from models import User
-from extensions import db
+from backend.models import User
+from backend.extensions import db
 
 
 # Extract current user from header (temporary, replace with Supabase JWT verification if needed)
@@ -20,7 +20,7 @@ return uid
 
 
 def create_notification(sender_id, receiver_id, ntype, post_id=None, comment_text=None):
-from models import Notification
+from backend.models import Notification
 n = Notification(
 sender_id=sender_id,
 receiver_id=receiver_id,

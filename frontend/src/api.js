@@ -4,7 +4,7 @@
 const API =
   process.env.REACT_APP_API_BASE_URL || // CRA
   (typeof import.meta !== "undefined" ? import.meta.env?.VITE_API_BASE_URL : null) || // Vite
-  "http://localhost:5000";
+  "https://refactored-goldfish-wrrpr9r4xg4ph9p54-5000.app.github.dev";
 
 // ---------- Auth ----------
 export async function login(email, password) {

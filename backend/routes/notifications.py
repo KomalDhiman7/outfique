@@ -1,7 +1,7 @@
 # backend/notifications.py
 from flask import Blueprint, jsonify, request
-from extensions import db
-from models import Notification
+from backend.extensions import db
+from backend.models import Notification
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 

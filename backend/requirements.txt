@@ -1,1 +1,11 @@
 # backend/requirements.txt
+flask
+flask_cors
+flask_sqlalchemy
+flask_jwt_extended
+requests
+cloudinary
+python-jose
+flask_bcrypt
+opencv-python-headless
+numpy

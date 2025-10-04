@@ -1,14 +1,14 @@
 from flask import Flask
 from flask_cors import CORS
 
-from extensions import jwt
-from routes.wardrobe import wardrobe_bp
-from routes.auth import auth_bp
-from routes.profile import profile_bp
-from routes.posts import posts_bp
-from routes.social import social_bp
-from routes.notifications import notifications_bp
-from routes.drip import drip_bp
+from backend.extensions import jwt
+from backend.routes.wardrobe import wardrobe_bp
+from backend.routes.auth import auth_bp
+from backend.routes.profile import profile_bp
+from backend.routes.posts import posts_bp
+from backend.routes.social import social_bp
+from backend.routes.notifications import notifications_bp
+from backend.routes.drip import drip_bp
 
 def create_app():
     app = Flask(__name__)

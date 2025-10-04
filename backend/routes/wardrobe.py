@@ -1,3 +1,5 @@
+from backend.models import WardrobeItem
+from backend.extensions import db
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import cloudinary.uploader
@@ -11,6 +13,7 @@ def upload_item():
     file = request.files.get("file")
 
     if not file:
+        print("[UPLOAD ERROR] No file uploaded")
         return jsonify({"error": "No file uploaded"}), 400
 
     try:
@@ -19,8 +22,6 @@ def upload_item():
         image_url = upload_result["secure_url"]
 
         # Save image_url + user_id + metadata into DB
-        from models import WardrobeItem
-        from extensions import db
         category = request.form.get("category")
         color = request.form.get("color")
         notes = request.form.get("notes")
@@ -34,6 +35,7 @@ def upload_item():
         db.session.add(item)
         db.session.commit()
 
+        print(f"[UPLOAD SUCCESS] User: {user_id}, Item ID: {item.id}, URL: {image_url}")
         return jsonify({
             "message": "Uploaded successfully ✅",
             "image_url": image_url,
@@ -41,4 +43,7 @@ def upload_item():
         }), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import traceback
+        print(f"[UPLOAD ERROR] {str(e)}")
+        traceback.print_exc()
+        return jsonify({"error": str(e), "trace": traceback.format_exc()}), 500
