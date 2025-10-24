@@ -1,34 +1,28 @@
-import React, { createContext, useState, useEffect } from "react";
-import { getCurrentUser } from "../api/authApi";
+import { createContext, useContext, useState } from 'react';
 
-export const AuthContext = createContext();
+const AuthContext = createContext(null);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (token) {
-      getCurrentUser(token)
-        .then((res) => setUser(res.data.user))
-        .catch(() => logout());
-    }
-  }, [token]);
-
-  const login = (token, userData) => {
-    setToken(token);
-    localStorage.setItem("token", token);
-    setUser(userData);
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("token");
+  const value = {
+    user,
+    setUser,
+    loading,
+    setLoading
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
